@@ -22,9 +22,6 @@ const App = () => {
             Todos are not loaded yet
             <button type="button" onClick={() => {
               dispatch(actions.loadTodos())
-                .then((value) => {
-                  console.log(value);
-                });
             }}>Load</button>
           </>}
 
@@ -34,9 +31,6 @@ const App = () => {
             Failed loading todos
             <button type="button" onClick={() => {
               dispatch(actions.loadTodos())
-                .then((value) => {
-                  console.log(value);
-                })
             }}>Reload</button>
           </>}
 
@@ -58,12 +52,17 @@ const App = () => {
         </p>
 
         <p className="info">
-          User is not selected
-          Loading...
-          User #1 is loaded
-          User #999 does not exist
-          Failed loading user
-          <button type="button">Reload</button>
+          <span>
+            User is not selected<br/>
+            Loading...<br/>
+            User #1 is loaded<br/>
+            User #999 does not exist<br/>
+
+            <span>
+              Failed loading user
+              <button type="button">Reload</button>
+            </span>
+          </span>
         </p>
       </section>
 

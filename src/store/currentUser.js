@@ -1,29 +1,25 @@
-import { createStore } from 'redux';
-
 const initialState = {
-  todos: [],
+  value: null,
   isLoading: false,
-  hasError: false,
   isInitialized: false,
-
-  currentUser: null,
+  hasError: false,
 };
 
-const SET_TODOS = 'SET_TODOS';
+const SET_USER = 'currentUser/SET_USER';
 const SET_ERROR = 'SET_ERROR';
-const ENABLE_LOADING = 'ENABLE_LOADING';
-const DISABLE_LOADING = 'DISABLE_LOADING';
-const INITIALIZE = 'INITIALIZE';
-const CANCEL_INITIALIZATION = 'CANCEL_INITIALIZATION';
+const ENABLE_LOADING = 'currentUser/ENABLE_LOADING';
+const DISABLE_LOADING = 'currentUser/DISABLE_LOADING';
+const INITIALIZE = 'currentUser/INITIALIZE';
+const CANCEL_INITIALIZATION = 'currentUser/CANCEL_INITIALIZATION';
 
 export const actions = {
+  setUser: (user) => ({
+    type: SET_USER,
+    payload: user,
+  }),
   setError: (hasError) => ({
     type: SET_ERROR,
     payload: hasError,
-  }),
-  setTodos: (todos) => ({
-    type: SET_TODOS,
-    payload: todos,
   }),
   enableLoading: () => ({
     type: ENABLE_LOADING,
@@ -38,13 +34,14 @@ export const actions = {
 };
 
 export const selectors = {
-  getTodos: state => state.todos,
+  getUser: state => state.value,
+  hasUser: state => !!state.value,
   isLoading: state => state.isLoading,
   isInitialized: state => state.isInitialized,
   hasError: state => state.hasError,
 };
 
-const reducer = (state = initialState, action) => {
+export default (state = initialState, action) => {
   switch (action.type) {
     case INITIALIZE:
       return {
@@ -66,22 +63,17 @@ const reducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
       };
-    case SET_TODOS:
+    case SET_USER:
       return {
         ...state,
-        todos: action.payload,
+        value: action.payload,
       };
     case SET_ERROR:
       return {
         ...state,
         hasError: action.payload,
       };
-
     default:
       return state;
   }
 };
-
-const store = createStore(reducer);
-
-export default store;

@@ -4,36 +4,38 @@ import { useDispatch, useSelector } from 'react-redux';
 import CurrentUser from './CurrentUser';
 import TodoList from './TodoList';
 import * as api from './api';
-import { actions, selectors } from './store';
+import { actions as todosActions } from './store/todos';
+import { actions as currentUserActions } from './store/currentUser';
+import { selectors } from './store'
 
 const App = () => {
   const [currentUser, setCurrentUse] = useState(null);
 
   const dispatch = useDispatch();
   const todos = useSelector(selectors.getTodos);
-  const isLoading = useSelector(selectors.isLoading);
-  const isInitialized = useSelector(selectors.isInitialized);
-  const hasError = useSelector(selectors.hasError);
+  const isLoading = useSelector(selectors.areTodosLoading);
+  const isInitialized = useSelector(selectors.areTodosInitialized);
+  const hasError = useSelector(selectors.hasTodosError);
 
   const loadTodos = async () => {
-    dispatch(actions.enableLoading());
-    dispatch(actions.setError(false));
+    dispatch(todosActions.enableLoading());
+    dispatch(todosActions.setError(false));
 
     try {
       const todosFromServer = await api.getTodos();
 
-      dispatch(actions.setTodos(todosFromServer));
-      dispatch(actions.initialize());
+      dispatch(todosActions.setTodos(todosFromServer));
+      dispatch(todosActions.initialize());
     } catch (error) {
-      dispatch(actions.setError(true));
+      dispatch(todosActions.setError(true));
     } finally {
-      dispatch(actions.disableLoading());
+      dispatch(todosActions.disableLoading());
     }
   };
 
   const clearTodos = () => {
-    dispatch(actions.setTodos([]));
-    dispatch(actions.cancelInitialization());
+    dispatch(todosActions.setTodos([]));
+    dispatch(todosActions.cancelInitialization());
   };
 
   return (

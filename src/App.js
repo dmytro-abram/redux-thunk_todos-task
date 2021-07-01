@@ -7,26 +7,25 @@ import * as api from './api';
 import { actions, selectors } from './store';
 
 const App = () => {
-  const [hasError, setError] = useState(false);
-  const [isInitialized, setInitialized] = useState(false);
   const [currentUser, setCurrentUse] = useState(null);
 
   const dispatch = useDispatch();
   const todos = useSelector(selectors.getTodos);
   const isLoading = useSelector(selectors.isLoading);
+  const isInitialized = useSelector(selectors.isInitialized);
+  const hasError = useSelector(selectors.hasError);
 
   const loadTodos = async () => {
     dispatch(actions.enableLoading());
-    setError(false);
+    dispatch(actions.setError(false));
 
     try {
       const todosFromServer = await api.getTodos();
 
       dispatch(actions.setTodos(todosFromServer));
-
-      setInitialized(true);
+      dispatch(actions.initialize());
     } catch (error) {
-      setError(true);
+      dispatch(actions.setError(true));
     } finally {
       dispatch(actions.disableLoading());
     }
@@ -34,8 +33,7 @@ const App = () => {
 
   const clearTodos = () => {
     dispatch(actions.setTodos([]));
-
-    setInitialized(false);
+    dispatch(actions.cancelInitialization());
   };
 
   return (

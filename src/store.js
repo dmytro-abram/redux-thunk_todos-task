@@ -1,20 +1,51 @@
 import { createStore } from 'redux';
 
 const initialState = {
-  x: 1,
+  hasError: false,
+  isLoading: false,
+  isInitialized: false,
+  todos: [],
+  currentUser: null,
 };
 
-const someAction = {
-  type: 'DO_SOMETHING',
-  payload: 'Action data',
+const SET_TODOS = 'SET_TODOS';
+const ENABLE_LOADING = 'ENABLE_LOADING';
+const DISABLE_LOADING = 'DISABLE_LOADING';
+
+export const actions = {
+  setTodos: (todos) => ({
+    type: SET_TODOS,
+    payload: todos,
+  }),
+  enableLoading: () => ({
+    type: ENABLE_LOADING,
+  }),
+  disableLoading: () => ({
+    type: DISABLE_LOADING,
+  }),
+};
+
+export const selectors = {
+  getTodos: state => state.todos,
+  isLoading: state => state.isLoading,
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'DO_SOMETHING':
+    case ENABLE_LOADING:
       return {
         ...state,
-        x: state.x + 1,
+        isLoading: true,
+      };
+    case DISABLE_LOADING:
+      return {
+        ...state,
+        isLoading: false,
+      };
+    case SET_TODOS:
+      return {
+        ...state,
+        todos: action.payload,
       };
 
     default:
@@ -23,15 +54,5 @@ const reducer = (state = initialState, action) => {
 };
 
 const store = createStore(reducer);
-
-store.subscribe(() => {
-  console.log(store.getState());
-});
-
-store.dispatch(someAction);
-store.dispatch(someAction);
-store.dispatch(someAction);
-store.dispatch(someAction);
-store.dispatch(someAction);
 
 export default store;

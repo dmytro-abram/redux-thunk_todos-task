@@ -1,34 +1,40 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import CurrentUser from './CurrentUser';
 import TodoList from './TodoList';
-import { getTodos, getUser } from './api';
+import * as api from './api';
+import { actions, selectors } from './store';
 
 const App = () => {
   const [hasError, setError] = useState(false);
-  const [isLoading, setLoading] = useState(false);
   const [isInitialized, setInitialized] = useState(false);
-  const [todos, setTodos] = useState([]);
   const [currentUser, setCurrentUse] = useState(null);
 
+  const dispatch = useDispatch();
+  const todos = useSelector(selectors.getTodos);
+  const isLoading = useSelector(selectors.isLoading);
+
   const loadTodos = async () => {
-    setLoading(true);
+    dispatch(actions.enableLoading());
     setError(false);
 
     try {
-      const todosFromServer = await getTodos();
+      const todosFromServer = await api.getTodos();
 
-      setTodos(todosFromServer);
+      dispatch(actions.setTodos(todosFromServer));
+
       setInitialized(true);
     } catch (error) {
       setError(true);
     } finally {
-      setLoading(false);
+      dispatch(actions.disableLoading());
     }
   };
 
   const clearTodos = () => {
-    setTodos([]);
+    dispatch(actions.setTodos([]));
+
     setInitialized(false);
   };
 
@@ -95,3 +101,4 @@ const App = () => {
 };
 
 export default App;
+

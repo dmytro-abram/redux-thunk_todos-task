@@ -41,7 +41,7 @@ export const selectors = {
   hasError: state => state.hasError,
 };
 
-export default (state = initialState, action) => {
+const todosReducer = (state = initialState, action) => {
   switch (action.type) {
     case INITIALIZE:
       return {
@@ -77,3 +77,5 @@ export default (state = initialState, action) => {
       return state;
   }
 };
+
+export default todosReducer;

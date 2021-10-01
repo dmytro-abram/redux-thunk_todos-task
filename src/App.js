@@ -1,152 +1,92 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useDispatch, useSelector} from 'react-redux';
 
 import CurrentUser from './CurrentUser';
 import TodoList from './TodoList';
-import { getTodos } from './api';
+import * as api from './api';
+import {actions, selectors} from './store';
 
-getTodos()
-  .then(todos => {
-    console.log(todos);
-  });
 
-const todos = [
-  {
-    userId: 1,
-    id: 1,
-    title: 'delectus aut autem',
-    completed: true,
-  },
-  {
-    userId: 2,
-    id: 2,
-    title: 'quis ut nam facilis et officia qui',
-    completed: false,
-  },
-  {
-    userId: 1,
-    id: 3,
-    title: 'fugiat veniam minus',
-    completed: false,
-  },
-  {
-    userId: 1,
-    id: 4,
-    title: 'et porro tempora',
-    completed: true,
-  },
-  {
-    userId: 4,
-    id: 5,
-    title: 'laboriosam mollitia et enim quasi adipisci quia provident illum',
-    completed: false,
-  },
-  {
-    userId: 1,
-    id: 6,
-    title: 'qui ullam ratione quibusdam voluptatem quia omnis',
-    completed: false,
-  },
-];
-const currentUser = {
-  id: 1,
-  name: 'Leanne Graham',
-  username: 'Bret',
-  email: 'Sincere@april.biz',
-  address: {
-    street: 'Kulas Light',
-    suite: 'Apt. 556',
-    city: 'Gwenborough',
-    zipcode: '92998-3874',
-    geo: {
-      lat: '-37.3159',
-      lng: '81.1496',
-    },
-  },
-  phone: '1-770-736-8031 x56442',
-  website: 'hildegard.org',
-  company: {
-    name: 'Romaguera-Crona',
-    catchPhrase: 'Multi-layered client-server neural-net',
-    bs: 'harness real-time e-markets',
-  },
-};
+const App = () => {
+  const dispatch = useDispatch();
 
-const App = () => (
-  <main className="App">
-    <section>
-      <p className="info">
-        Todos are not loaded yet
-        <button type="button">Load</button>
-      </p>
+  const todos = useSelector(selectors.getTodos);
+  const isLoading = useSelector(selectors.isLoading);
+  const isInitialized = useSelector(selectors.isInitialized);
+  const hasError = useSelector(selectors.hasError);
 
-      <p className="info">User is not selected</p>
-    </section>
+  const loadTodos = async() => {
+    dispatch(actions.enableLoading());
+    dispatch(actions.disableError());
 
-    <section>
-      <p className="info">Loading...</p>
-      <p className="info">Loading...</p>
-    </section>
+    try {
+      const todosFromServer = await api.getTodos();
+      const action = actions.setTodos(todosFromServer);
+      dispatch(action);
+      dispatch(actions.enableInitialized());
+    } catch(error) {
+      dispatch(actions.enableError());
+    } finally {
+      dispatch(actions.disableLoading());
+    }
+  };
 
-    <section>
-      <p className="info">
-        Failed loading todos
-        <button type="button">Reload</button>
-      </p>
+  const cleatTodos = () => {
+    const action = actions.setTodos([]);
+    dispatch(action);
+    dispatch(actions.disableInitialized());
+  }
 
-      <p className="info">
-        Failed loading user
-        <button type="button">Reload</button>
-      </p>
-    </section>
+  return (
+    <main className="App">
+      <section>
+        <p className="info">
 
-    <section>
-      <p className="info">
-        6 todos are loaded
-        <button type="button">Clear</button>
-      </p>
+          {!isInitialized && !isLoading && !hasError && <>
+            Todos are not loaded yet
+            <button type="button" onClick={loadTodos}>Load</button>
+          </>}
 
-      <p className="info">
-        User #1 is loaded
-        <button type="button">Clear</button>
-      </p>
-    </section>
+          {isLoading && 'Loading...'}
 
-    <section>
-      <p className="info">
-        1 todo is loaded
-        <button type="button">Clear</button>
-      </p>
+          {hasError  && <>
+            Failed loading todos
+            <button type="button" onClick={loadTodos}>Reload</button>
+          </>}
 
-      <p className="info">User #999 does not exist</p>
-    </section>
 
-    <section>
-      <div className="content">
-        <p>-</p>
-      </div>
-      <div className="content">
-        <p>-</p>
-      </div>
-    </section>
+          {isInitialized && todos.length === 0 && <>
+            Todos are no todos
+            <button type="button" onClick={loadTodos}>Reload</button>
+          </>}
 
-    <section>
-      <div className="content">
-        <div className="loader" />
-      </div>
-      <div className="content">
-        <CurrentUser user={currentUser} />
-      </div>
-    </section>
+          {isInitialized && todos.length > 0 && <>
+            {todos.length} todos are loaded
+            <button type="button" onClick = {cleatTodos}>Clear</button>
+          </>}
 
-    <section>
-      <div className="content">
-        <TodoList todos={todos} />
-      </div>
-      <div className="content">
-        <div className="loader" />
-      </div>
-    </section>
-  </main>
-);
+        </p>
+      </section>
+
+
+      <section>
+        <div className="content">
+          {!isLoading && todos.length === 0 && (
+            <p>-</p>
+          )}
+
+          {isLoading && (
+            <div className="loader" />
+          )}
+
+          {!isLoading && todos.length > 0 && (
+            <TodoList todos={todos} />
+          )}
+        </div>
+      </section>
+
+    </main>
+  )
+}
 
 export default App;

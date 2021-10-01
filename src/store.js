@@ -9,12 +9,11 @@ const initialState = {
 
 //action type
 const SET_TODOS = 'SET_TODOS';
+const SET_ERROR = 'SET_ERROR';
 const ENABLE_LOADING = 'ENABLE_LOADING';
 const DISABLE_LOADING = 'DISABLE_LOADING';
-const ENABLE_ERROR = 'ENABLE_ERROR';
-const DISABLE_ERROR = 'DISABLE_ERROR';
-const ENABLE_INITIALIZED = 'ENABLE_INITIALIZED';
-const DISABLE_INITIALIZED = 'DISABLE_INITIALIZED';
+const INITIALIZED = 'INITIALIZED';
+const CANCEL_INITIALIZED = 'CANCEL_INITIALIZED';
 
 
 //action creator
@@ -32,19 +31,17 @@ export const actions = {
     type: DISABLE_LOADING,
   }),
 
-  enableError: () => ({
-    type: ENABLE_ERROR,
+  setError: (hasError) => ({
+    type: SET_ERROR,
+    payload: hasError,
   }),
 
-  disableError: () => ({
-    type: DISABLE_ERROR,
-  }),
-  enableInitialized: () => ({
-    type: ENABLE_INITIALIZED,
+  initialized: () => ({
+    type: INITIALIZED,
   }),
 
-  disableInitialized: () => ({
-    type: DISABLE_INITIALIZED,
+  cancelInitialized: () => ({
+    type: CANCEL_INITIALIZED,
   }),
 };
 
@@ -76,25 +73,19 @@ const reducer = (state = initialState, action) => {
         isLoading: false,
       }
 
-    case ENABLE_ERROR:
+    case SET_ERROR:
       return {
         ...state,
-        hasError: true,
+        hasError: action.payload,
       }
 
-    case DISABLE_ERROR:
-      return {
-        ...state,
-        hasError: false,
-      }
-
-    case ENABLE_INITIALIZED:
+    case INITIALIZED:
       return {
         ...state,
         isInitialized: true,
       }
 
-    case DISABLE_INITIALIZED:
+    case CANCEL_INITIALIZED:
       return {
         ...state,
         isInitialized: false,

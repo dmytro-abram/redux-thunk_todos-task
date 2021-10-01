@@ -17,16 +17,16 @@ const App = () => {
 
   const loadTodos = async() => {
     dispatch(actions.enableLoading());
-    dispatch(actions.disableError());
+    dispatch(actions.setError(false));
 
     try {
       const todosFromServer = await api.getTodos();
       const action = actions.setTodos(todosFromServer);
       dispatch(action);
-      dispatch(actions.enableInitialized());
+      dispatch(actions.initialized());
     } catch(error) {
-      dispatch(actions.enableError());
-    } finally {
+      dispatch(actions.setError(true));
+    } finally { 
       dispatch(actions.disableLoading());
     }
   };
@@ -34,7 +34,7 @@ const App = () => {
   const cleatTodos = () => {
     const action = actions.setTodos([]);
     dispatch(action);
-    dispatch(actions.disableInitialized());
+    dispatch(actions.cancelInitialized());
   }
 
   return (

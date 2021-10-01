@@ -4,7 +4,11 @@ import todosReducer, {
    selectors as todosSelectors,
    actions as todosActions,
 } from './todos';
-import currentUserReducer, { selectors as userSelectors } from './currentUser';
+
+import currentUserReducer, { 
+  selectors as userSelectors,
+  actions as userActions,
+} from './currentUser';
 
 import * as api from '../api';
 
@@ -14,8 +18,10 @@ export const selectors = {
   hasTodosError: state => todosSelectors.hasError(state.todos),
   areTodosInitialized: state => todosSelectors.isInitialized(state.todos),
 
-
+  getUser: state => userSelectors.getUser(state.currentUser),
   isUserLoading: state => userSelectors.isLoading(state.currentUser),
+  hasUserError: state => userSelectors.hasError(state.currentUser),
+  areUserInitialized: state => userSelectors.isInitialized(state.currentUser),
 }
 
 export const actions = {
@@ -26,13 +32,31 @@ export const actions = {
   
       try {
         const todosFromServer = await api.getTodos();
-        const action = todosActions.setTodos(todosFromServer);
+        const action = todosActions.setTodos(todosFromServer)
         dispatch(action);
         dispatch(todosActions.initialized());
       } catch(error) {
-        dispatch(todosActions.setError(true));
+          dispatch(todosActions.setError(true));
       } finally { 
-        dispatch(todosActions.disableLoading());
+          dispatch(todosActions.disableLoading());
+      }
+    };
+  },
+
+  showUser: (userId) => {
+    return async (dispatch) => {
+      dispatch(userActions.enableLoading());
+      dispatch(userActions.setError(false));
+
+      try {
+        const userFromServer = await api.getUser(userId)
+        const action = userActions.setUser(userFromServer);
+        dispatch(action);
+        dispatch(userActions.initialized());
+      } catch (error) {
+        dispatch(userActions.setError(true));
+      } finally {
+        dispatch(userActions.disableLoading());
       }
     };
   },
@@ -42,6 +66,14 @@ export const actions = {
       const action = todosActions.setTodos([]);
       dispatch(action);
       dispatch(todosActions.cancelInitialized());
+    };
+  },
+
+  clearUser: () => {
+    return (dispatch) => {
+      const action = userActions.setUser(null);
+      dispatch(action);
+      dispatch(userActions.cancelInitialized());
     };
   },
 

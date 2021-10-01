@@ -1,7 +1,7 @@
 const API_URL = 'https://jsonplaceholder.typicode.com';
 
 export const getTodos = async() => {
-  await wait(2000);
+  await wait(500);
   const response = await fetch(`${API_URL}/todos`);
   const todos = await response.json();
 
@@ -11,7 +11,7 @@ export const getTodos = async() => {
 };
 
 export const getUser = async(userId) => {
-  await wait(2000);
+  await wait(1000);
   const response = await fetch(`${API_URL}/users/${userId}`);
 
   return response.json();

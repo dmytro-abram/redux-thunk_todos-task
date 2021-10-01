@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector} from 'react-redux';
 
 import TodoList from './TodoList';
-import { selectors, actions } from './store';
+import CurrentUser from './CurrentUser';
 
+import { selectors, actions } from './store';
+import { getUser } from './api'
 
 const App = () => {
   const dispatch = useDispatch();
@@ -13,6 +15,10 @@ const App = () => {
   const isInitialized = useSelector(selectors.areTodosInitialized);
   const hasError = useSelector(selectors.hasTodosError);
 
+ const user = useSelector(selectors.getUser);
+ const isUserLoading = useSelector(selectors.isUserLoading);
+ const hasUserError = useSelector(selectors.hasUserError);
+ const isUserInitialized = useSelector(selectors.areUserInitialized);
 
   return (
     <main className="App">
@@ -30,9 +36,9 @@ const App = () => {
 
           {hasError  && <>
             Failed loading todos
-            <button type="button"  onClick={() => {
+            <button type="button" onClick={
               dispatch(actions.loadTodos())
-            }}>Reload</button>
+            }>Reload</button>
           </>}
 
 
@@ -51,6 +57,30 @@ const App = () => {
           </>}
 
         </p>
+
+        <p className="info">
+          <span>
+            {!user && !isUserLoading && !hasUserError && <>
+              User is not selected
+            </>}
+
+            {isUserLoading && 'Loading...'}
+
+            {isUserInitialized && user && !isUserLoading && <>
+              User #{user.id} is loaded
+              <button type="button" onClick = {() => {
+                dispatch(actions.clearUser())
+              }}>Clear</button>
+            </>}
+
+            <span>
+              {hasUserError && <>
+                Failed loading user
+                <button type="button" onClick={() => dispatch(actions.showUser(user.id)) }> Reload</button>
+              </>}
+            </span>
+          </span>
+        </p>
       </section>
 
 
@@ -65,11 +95,22 @@ const App = () => {
           )}
 
           {!isLoading && todos.length > 0 && (
-            <TodoList todos={todos} />
+            <TodoList todos={todos}/>
           )}
         </div>
-      </section>
 
+        <div className="content">
+          {!isUserLoading && !user && <>
+            <p>-</p>
+          </>}
+
+          {isUserLoading && (
+            <div className="loader" />
+          )}
+
+          {user && !isUserLoading && <CurrentUser user={user} />}
+        </div>
+      </section>
     </main>
   )
 }

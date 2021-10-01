@@ -40,11 +40,11 @@ export const actions = {
   cancelInitialized: () => ({
     type: CANCEL_INITIALIZED,
   }),
+
 };
 
 export const selectors = {
   getUser: state => state.value,
-  hasUser: state => !!state.value,
   isLoading: state => state.isLoading,
   isInitialized: state => state.isInitialized,
   hasError: state => state.hasError,
